@@ -1,0 +1,354 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "connections_VPNConnection_location": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "connections_VPNConnection_location_1": {
+            "defaultValue": null,
+            "type": "SecureString"
+        },
+        "virtualNetworks_172_name": {
+            "defaultValue": "172",
+            "type": "String"
+        },
+        "connections_VPNConnection_name": {
+            "defaultValue": "VPNConnection",
+            "type": "String"
+        },
+        "virtualNetworkGateways_VPNGW_name": {
+            "defaultValue": "VPNGW",
+            "type": "String"
+        },
+        "localNetworkGateways_LocalNetGW_name": {
+            "defaultValue": "LocalNetGW",
+            "type": "String"
+        },
+        "publicIPAddresses_PublicIPforVPN_name": {
+            "defaultValue": "PublicIPforVPN",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Network/connections",
+            "apiVersion": "2018-12-01",
+            "name": "[parameters('connections_VPNConnection_name')]",
+            "location": "eastus2",
+            "tags": {
+                "Owner": "Matt Riley"
+            },
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "location": "[parameters('connections_VPNConnection_location')]",
+                    "properties": {}
+                },
+                "localNetworkGateway2": {
+                    "location": "[parameters('connections_VPNConnection_location_1')]",
+                    "properties": {}
+                },
+                "connectionType": "IPsec",
+                "connectionProtocol": "IKEv2",
+                "routingWeight": 0,
+                "enableBgp": false,
+                "usePolicyBasedTrafficSelectors": false,
+                "ipsecPolicies": [],
+                "expressRouteGatewayBypass": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/localNetworkGateways",
+            "apiVersion": "2018-12-01",
+            "name": "[parameters('localNetworkGateways_LocalNetGW_name')]",
+            "location": "eastus2",
+            "tags": {
+                "Owner": "Matt Riley"
+            },
+            "properties": {
+                "localNetworkAddressSpace": {
+                    "addressPrefixes": [
+                        "192.168.1.0/24"
+                    ]
+                },
+                "gatewayIpAddress": "104.230.1.93"
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2018-12-01",
+            "name": "[parameters('publicIPAddresses_PublicIPforVPN_name')]",
+            "location": "eastus2",
+            "tags": {
+                "Owner": "Matt Riley"
+            },
+            "sku": {
+                "name": "Basic",
+                "tier": "Regional"
+            },
+            "properties": {
+                "ipAddress": "104.46.4.72",
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 4,
+                "ipTags": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2018-12-01",
+            "name": "[parameters('virtualNetworks_172_name')]",
+            "location": "eastus2",
+            "tags": {
+                "Owner": "Matt Riley"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[concat(parameters('virtualNetworks_172_name'), '.16.0.0/12')]"
+                    ]
+                },
+                "dhcpOptions": {
+                    "dnsServers": [
+                        "8.8.8.8"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "SUB1",
+                        "properties": {
+        
+                            "addressPrefix": "[concat(parameters('virtualNetworks_172_name'), '.16.1.0/27')]",
+                            "serviceEndpoints": [],
+                            "delegations": []
+                        }
+                    },
+                    {
+                        "name": "SUB3",
+                        "properties": {
+        
+                            "addressPrefix": "[concat(parameters('virtualNetworks_172_name'), '.16.1.64/27')]",
+                            "serviceEndpoints": [],
+                            "delegations": []
+                        }
+                    },
+                    {
+                        "name": "SUB4",
+                        "properties": {
+        
+                            "addressPrefix": "[concat(parameters('virtualNetworks_172_name'), '.16.1.96/27')]",
+                            "serviceEndpoints": [],
+                            "delegations": []
+                        }
+                    },
+                    {
+                        "name": "SUB5",
+                        "properties": {
+        
+                            "addressPrefix": "[concat(parameters('virtualNetworks_172_name'), '.16.1.128/27')]",
+                            "serviceEndpoints": [],
+                            "delegations": []
+                        }
+                    },
+                    {
+                        "name": "GatewaySubnet",
+                        "properties": {
+        
+                            "addressPrefix": "[concat(parameters('virtualNetworks_172_name'), '.16.255.224/27')]",
+                            "serviceEndpoints": [],
+                            "delegations": []
+                        }
+                    },
+                    {
+                        "name": "AzureFirewallSubnet",
+                        "properties": {
+        
+                            "addressPrefix": "[concat(parameters('virtualNetworks_172_name'), '.16.2.64/26')]",
+                            "serviceEndpoints": [],
+                            "delegations": []
+                        }
+                    },
+                    {
+                        "name": "SUB2",
+                        "properties": {
+        
+                            "addressPrefix": "[concat(parameters('virtualNetworks_172_name'), '.16.1.32/27')]",
+                            "serviceEndpoints": [],
+                            "delegations": []
+                        }
+                    },
+                    {
+                        "name": "SUB6",
+                        "properties": {
+        
+                            "addressPrefix": "[concat(parameters('virtualNetworks_172_name'), '.16.1.160/27')]",
+                            "serviceEndpoints": [],
+                            "delegations": []
+                        }
+                    }
+                ],
+                "virtualNetworkPeerings": [],
+                "enableDdosProtection": false,
+                "enableVmProtection": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-12-01",
+            "name": "[concat(parameters('virtualNetworks_172_name'), '/AzureFirewallSubnet')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_172_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "172.16.2.64/26",
+                "serviceEndpoints": [],
+                "delegations": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-12-01",
+            "name": "[concat(parameters('virtualNetworks_172_name'), '/GatewaySubnet')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_172_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "172.16.255.224/27",
+                "serviceEndpoints": [],
+                "delegations": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-12-01",
+            "name": "[concat(parameters('virtualNetworks_172_name'), '/SUB1')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_172_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "172.16.1.0/27",
+                "serviceEndpoints": [],
+                "delegations": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-12-01",
+            "name": "[concat(parameters('virtualNetworks_172_name'), '/SUB2')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_172_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "172.16.1.32/27",
+                "serviceEndpoints": [],
+                "delegations": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-12-01",
+            "name": "[concat(parameters('virtualNetworks_172_name'), '/SUB3')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_172_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "172.16.1.64/27",
+                "serviceEndpoints": [],
+                "delegations": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-12-01",
+            "name": "[concat(parameters('virtualNetworks_172_name'), '/SUB4')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_172_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "172.16.1.96/27",
+                "serviceEndpoints": [],
+                "delegations": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-12-01",
+            "name": "[concat(parameters('virtualNetworks_172_name'), '/SUB5')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_172_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "172.16.1.128/27",
+                "serviceEndpoints": [],
+                "delegations": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2018-12-01",
+            "name": "[concat(parameters('virtualNetworks_172_name'), '/SUB6')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_172_name'))]"
+            ],
+            "properties": {
+                "addressPrefix": "172.16.1.160/27",
+                "serviceEndpoints": [],
+                "delegations": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "2018-12-01",
+            "name": "[parameters('virtualNetworkGateways_VPNGW_name')]",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_PublicIPforVPN_name'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_172_name'), 'GatewaySubnet')]"
+            ],
+            "tags": {
+                "Owner": "Matt Riley"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "default",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_PublicIPforVPN_name'))]"
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_172_name'), 'GatewaySubnet')]"
+                            }
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "VpnGw1",
+                    "tier": "VpnGw1",
+                    "capacity": 2
+                },
+                "gatewayType": "Vpn",
+                "vpnType": "RouteBased",
+                "enableBgp": false,
+                "activeActive": false,
+                "vpnClientConfiguration": {
+                    "vpnClientProtocols": [
+                        "SSTP",
+                        "IkeV2"
+                    ],
+                    "vpnClientRootCertificates": [],
+                    "vpnClientRevokedCertificates": [],
+                    "vpnClientIpsecPolicies": []
+                },
+                "bgpSettings": {
+                    "asn": 65515,
+                    "bgpPeeringAddress": "172.16.255.254",
+                    "peerWeight": 0
+                }
+            }
+        }
+    ]
+}

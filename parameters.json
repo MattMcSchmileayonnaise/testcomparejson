@@ -1,0 +1,27 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "connections_VPNConnection_location": {
+            "value": null
+        },
+        "connections_VPNConnection_location_1": {
+            "value": null
+        },
+        "virtualNetworks_172_name": {
+            "value": null
+        },
+        "connections_VPNConnection_name": {
+            "value": null
+        },
+        "virtualNetworkGateways_VPNGW_name": {
+            "value": null
+        },
+        "localNetworkGateways_LocalNetGW_name": {
+            "value": null
+        },
+        "publicIPAddresses_PublicIPforVPN_name": {
+            "value": null
+        }
+    }
+}
